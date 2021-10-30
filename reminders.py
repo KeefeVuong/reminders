@@ -1,13 +1,55 @@
 from tkinter import *
 
+data = {
+    "reminders": []
+}
+
 top = Tk()
+
+def add_reminder(reminders_list, date_entry, reminder_entry):
+    new_date = date_entry.get()
+    new_string = reminder_entry.get()
+    new_reminder = new_date + " - " + new_string
+
+    reminder_data = {
+        "date": new_date,
+        "string": new_string
+    }
+
+    data["reminders"].append(reminder_data)
+
+    reminders_list.insert(0, new_reminder)
+    date_entry.delete(0, END)
+    reminder_entry.delete(0, END)
+
+def delete_reminder(reminders_list):
+    removed_item_index = reminders_list.curselection()
+    removed_item = reminders_list.get(removed_item_index[0])
+
+    removed_item_list = removed_item.split(" - ")
+    for item in data["reminders"]:
+        if item["date"] == removed_item_list[0] and item["string"] == removed_item_list[1]:
+            data["reminders"].remove(item)
+
+    print(data)
+    index = reminders_list.get(0, END).index(removed_item)
+    reminders_list.delete(index)
 
 def edit_reminder(reminders_list, edit_date_entry, edit_reminder_entry):
     new_date = edit_date_entry.get()
-    new_reminder = new_date + " - " + edit_reminder_entry.get()
+    new_string = edit_reminder_entry.get()
+    new_reminder = new_date + " - " + new_string
 
     removed_item_index = reminders_list.curselection()
     removed_item = reminders_list.get(removed_item_index[0])
+
+    removed_item_list = removed_item.split(" - ")
+    for item in data["reminders"]:
+        if item["date"] == removed_item_list[0] and item["string"] == removed_item_list[1]:
+            item["date"] = new_date
+            item["string"] = new_string
+
+    print(data)
 
     index = reminders_list.get(0, END).index(removed_item)
     reminders_list.delete(index)
@@ -65,7 +107,7 @@ reminder_entry_str = StringVar(None)
 reminder_entry = Entry(top, textvariable=reminder_entry_str, width=45)
 reminder_entry.grid(row=1, column=1, padx=25, columnspan=3)
 
-add_reminder_button = Button(top, text="Add Reminder")
+add_reminder_button = Button(top, text="Add Reminder", command=lambda: add_reminder(reminders_list_listbox, date_entry, reminder_entry))
 add_reminder_button.grid(row=2, column=1)
 
 reminders_list_label_str = StringVar()
@@ -89,7 +131,7 @@ reminders_list_scrollbar.config(command=reminders_list_listbox.yview)
 edit_reminder_button = Button(top, text="Edit Reminder", command=lambda: edit_reminder_input(reminders_list_listbox))
 edit_reminder_button.grid(row=3, column=1)
 
-delete_reminder_button = Button(top, text="Delete Reminder")
+delete_reminder_button = Button(top, text="Delete Reminder", command=lambda: delete_reminder(reminders_list_listbox))
 delete_reminder_button.grid(row=3, column=2)
 
 top.mainloop()
